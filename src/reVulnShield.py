@@ -5,6 +5,18 @@ import time
 import os
 import re
 
+def check_nmap_version():
+    try:
+        result = subprocess.run(["nmap", "-V"], capture_output=True, text=True)
+        if result.returncode == 0:
+            print("Nmap version:", result.stdout.strip())
+            return True
+        else:
+            print("Nmap not found or error occurred.")
+    except FileNotFoundError:
+        print("Nmap not found. Please install Nmap.\nsudo apt install nmap -y")
+    return False
+
 
 def run_nmap_scan(target_ip):
     # Run nmap scan to find open ports and operating system
@@ -71,7 +83,8 @@ if __name__ == "__main__":
     # Get the kernel version
     kernel_version = platform.release()
     print("Kernel Version:", kernel_version)
-
+    if not check_nmap_version():
+        exit(0)
     target_ip = input("Enter the IP address: ")
     nmap_output = run_nmap_scan(target_ip)
     ports_info = parse_nmap_port_state_info(nmap_output)
